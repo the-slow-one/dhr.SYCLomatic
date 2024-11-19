@@ -193,10 +193,8 @@ std::shared_ptr<TranslationUnitInfo> DpctToolAction::createTranslationUnitInfoIm
       Invocation, std::make_shared<PCHContainerOperations>(), Diags, &FEAction,
       Info->AST.get());
   Success = !DiagConsumer->getNumErrors();
-  if (Ret && (bool)&Info->AST->getASTContext()) {
-    Info->AST->Save("some.tu");
+  if (Ret && (bool)&Info->AST->getASTContext())
     return Info;
-  }
   return std::shared_ptr<TranslationUnitInfo>();
 }
 
