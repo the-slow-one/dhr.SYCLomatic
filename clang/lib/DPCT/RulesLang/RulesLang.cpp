@@ -1381,8 +1381,11 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
     return;
   }
   if (const auto *TL = getNodeAsType<TypeLoc>(Result, "cudaTypeDef")) {
+    std::cout << "\nThis is the version! Found name tag: cudaTypeDef\n";
     if (const auto *TypePtr = TL->getTypePtr()) {
+      std::cout << "Found TypePtr\n";
       if (isTypeInAnalysisScope(TypePtr)) {
+        std::cout << "TypePtr is analysis scope\n";
         if (const auto *const ET = dyn_cast<ElaboratedType>(TypePtr))
           TypePtr = ET->getNamedType().getTypePtr();
 
@@ -1391,11 +1394,14 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
         if (TypePtr->getTypeClass() != clang::Type::Typedef)
           return;
 
+        std::cout << "TypePtr is not typedef\n";
+
         // When a CUDA type is redefined in the files under analysis we
-        // want to migrate them.
+        // don't want to migrate them.
         const auto *TT = dyn_cast<TypedefType>(TypePtr);
         if (!isRedeclInCUDAHeader(TT))
           return;
+        std::cout  << "Not a CUDA redefined TypePtr\n";
       }
     }
 
@@ -1405,12 +1411,16 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
         TL->getBeginLoc().isInvalid()) {
       return;
     }
+    std::cout << "Type is not Invalid neither SubstTemplateTypeParm\n";
 
     if(isCapturedByLambda(TL))
       return;
 
+    std::cout << "Type is not capture by lambda\n";
+
     auto TypeStr =
         DpctGlobalInfo::getTypeName(TL->getType().getUnqualifiedType());
+    std::cout << "And found name too: " << TypeStr << "\n";
 
     if (auto FD = DpctGlobalInfo::getParentFunction(TL)) {
       if (FD->isImplicit())
@@ -1518,11 +1528,14 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
       return;
     }
 
+    std::cout << "Still going after replaceTransformIterator\n";
     if (TL->getTypeLocClass() == clang::TypeLoc::Elaborated) {
+      std::cout << "Is an elaborated type\n";
       auto ETC = TL->getAs<ElaboratedTypeLoc>();
       auto NTL = ETC.getNamedTypeLoc();
 
-      if (const auto *RD = NTL.getType().getCanonicalType()->getAsRecordDecl())
+      if (const auto *RD = NTL.getType().getCanonicalType()->getAsRecordDecl()) {
+        std::cout << "Got as RecordDecl\n";
         if (DpctGlobalInfo::isInCudaPath(RD->getBeginLoc()) &&
             (TypeStr == "cudaMemcpy3DParms" || TypeStr == "CUDA_MEMCPY3D" ||
              TypeStr == "CUDA_MEMCPY2D" || TypeStr == "cudaMemcpy3DPeerParms" ||
@@ -1531,6 +1544,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
             if (const auto *Init = VarD->getInit())
               if (const auto *VarInitExpr = dyn_cast<InitListExpr>(Init))
                 emplaceTransformation(new ReplaceStmt(VarInitExpr, "{}"));
+      }
 
       if (NTL.getTypeLocClass() == clang::TypeLoc::TemplateSpecialization) {
         auto TSL =
@@ -1540,6 +1554,11 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
           return;
         }
       } else if (NTL.getTypeLocClass() == clang::TypeLoc::Record) {
+        if (!DpctGlobalInfo::isInCudaPath(NTL.getBeginLoc())) {
+            std::cout << "NamedTypeDecl is not in CUDAPATH. Exiting\n";
+            return;
+        }
+
         if (TypeStr.find("nv_bfloat16") != std::string::npos &&
             !DpctGlobalInfo::useBFloat16()) {
           return;
@@ -1551,6 +1570,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
             dpct::DpctGlobalInfo::getTypeName(TSL.getType());
         std::string Replacement =
             MapNames::findReplacedName(MapNames::TypeNamesMap, TyName);
+        std::cout << "TypeName: " << TyName << " Repl: " << Replacement << "\n";
         requestHelperFeatureForTypeNames(TyName);
         insertHeaderForTypeRule(TyName, TL->getBeginLoc());
 
@@ -1562,6 +1582,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
         }
       }
     } else if (TL->getTypeLocClass() == clang::TypeLoc::Qualified) {
+      std::cout << "Is a qualified type\n";
       // To process the case like "typename
       // thrust::device_vector<int>::iterator itr;".
       auto ETL = TL->getUnqualifiedLoc().getAs<ElaboratedTypeLoc>();
@@ -1593,6 +1614,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
 
     std::string Str =
         MapNames::findReplacedName(MapNames::TypeNamesMap, TypeStr);
+    std::cout << "Found replacement name: "<< Str << "\n";
     insertHeaderForTypeRule(TypeStr, BeginLoc);
     requestHelperFeatureForTypeNames(TypeStr);
     if (Str.empty()) {
@@ -1670,6 +1692,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
       emplaceTransformation(new ReplaceText(BeginLoc, Len, std::move(Str)));
       return;
     }
+    std::cout << "End of cudaTypeDef if\n";
   }
 
   if (auto VD =
