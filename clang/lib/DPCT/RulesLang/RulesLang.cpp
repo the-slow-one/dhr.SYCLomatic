@@ -1395,7 +1395,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
           return;
 
         // When a CUDA type is redefined in the files under analysis we
-        // don't want to migrate them.
+        // want to migrate them.
         const auto *TT = dyn_cast<TypedefType>(TypePtr);
         if (!isRedeclInCUDAHeader(TT))
           return;
@@ -1525,7 +1525,7 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
       auto ETC = TL->getAs<ElaboratedTypeLoc>();
       auto NTL = ETC.getNamedTypeLoc();
 
-      if (const auto *RD = NTL.getType().getCanonicalType()->getAsRecordDecl()) {
+      if (const auto *RD = NTL.getType().getCanonicalType()->getAsRecordDecl())
         if (DpctGlobalInfo::isInCudaPath(RD->getBeginLoc()) &&
             (TypeStr == "cudaMemcpy3DParms" || TypeStr == "CUDA_MEMCPY3D" ||
              TypeStr == "CUDA_MEMCPY2D" || TypeStr == "cudaMemcpy3DPeerParms" ||
@@ -1534,7 +1534,6 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
             if (const auto *Init = VarD->getInit())
               if (const auto *VarInitExpr = dyn_cast<InitListExpr>(Init))
                 emplaceTransformation(new ReplaceStmt(VarInitExpr, "{}"));
-      }
 
       if (NTL.getTypeLocClass() == clang::TypeLoc::TemplateSpecialization) {
         auto TSL =
@@ -1761,7 +1760,7 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     if (TL->getBeginLoc().isInvalid())
       return;
 
-    // To skip user-defined type (found in in-root and from third party includes outside of in-root.
+    // To skip user-defined type (found in in-root and from third party includes outside of in-root)
     if (const auto *ND = getNamedDecl(TL->getTypePtr())) {
       auto Loc = ND->getBeginLoc();
       if (DpctGlobalInfo::isInAnalysisScope(Loc))
