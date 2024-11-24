@@ -1543,7 +1543,8 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
           return;
         }
       } else if (NTL.getTypeLocClass() == clang::TypeLoc::Record) {
-        if (!DpctGlobalInfo::isInCudaPath(NTL.getBeginLoc())) {
+        const auto *RecDeclRepr = NTL.getType().getCanonicalType()->getAsRecordDecl();
+        if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc())) {
             return;
         }
 
@@ -1765,9 +1766,11 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
       auto Loc = ND->getBeginLoc();
       if (DpctGlobalInfo::isInAnalysisScope(Loc))
         return;
+}
 
+    if(const auto *RecDeclRepr = TL->getType().getCanonicalType()->getAsRecordDecl()) {
       // Skip third-party includes outside of in-root
-      if (!DpctGlobalInfo::isInCudaPath(Loc))
+      if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc()))
         return;
     }
 
