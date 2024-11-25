@@ -1399,8 +1399,9 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
         const auto *TT = dyn_cast<TypedefType>(TypePtr);
         if (!isRedeclInCUDAHeader(TT))
           return;
-      } if (const auto *RecDeclRepr =
-            TL->getType().getCanonicalType()->getAsRecordDecl()) {
+      }
+      if (const auto *RecDeclRepr =
+              TL->getType().getCanonicalType()->getAsRecordDecl()) {
         // Skip types whose names are matching with CUDA types and defined in
         // includes outside of in-root
         if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc()))
