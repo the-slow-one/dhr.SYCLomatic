@@ -1399,6 +1399,12 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
         const auto *TT = dyn_cast<TypedefType>(TypePtr);
         if (!isRedeclInCUDAHeader(TT))
           return;
+      } if (const auto *RecDeclRepr =
+            TL->getType().getCanonicalType()->getAsRecordDecl()) {
+        // Skip types whose names are matching with CUDA types and defined in
+        // includes outside of in-root
+        if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc()))
+          return;
       }
     }
 
@@ -1543,12 +1549,6 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
           return;
         }
       } else if (NTL.getTypeLocClass() == clang::TypeLoc::Record) {
-        const auto *RecDeclRepr =
-            NTL.getType().getCanonicalType()->getAsRecordDecl();
-        if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc())) {
-          return;
-        }
-
         if (TypeStr.find("nv_bfloat16") != std::string::npos &&
             !DpctGlobalInfo::useBFloat16()) {
           return;
@@ -1772,7 +1772,8 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
 
     if (const auto *RecDeclRepr =
             TL->getType().getCanonicalType()->getAsRecordDecl()) {
-      // Skip third-party includes outside of in-root
+      // Skip types whose names are matching with CUDA types and defined in
+      // includes outside of in-root
       if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc()))
         return;
     }
