@@ -1543,9 +1543,10 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
           return;
         }
       } else if (NTL.getTypeLocClass() == clang::TypeLoc::Record) {
-        const auto *RecDeclRepr = NTL.getType().getCanonicalType()->getAsRecordDecl();
+        const auto *RecDeclRepr =
+            NTL.getType().getCanonicalType()->getAsRecordDecl();
         if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc())) {
-            return;
+          return;
         }
 
         if (TypeStr.find("nv_bfloat16") != std::string::npos &&
@@ -1761,14 +1762,16 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     if (TL->getBeginLoc().isInvalid())
       return;
 
-    // To skip user-defined type (found in in-root and from third party includes outside of in-root)
+    // To skip user-defined type (found in in-root and from third party includes
+    // outside of in-root)
     if (const auto *ND = getNamedDecl(TL->getTypePtr())) {
       auto Loc = ND->getBeginLoc();
       if (DpctGlobalInfo::isInAnalysisScope(Loc))
         return;
-}
+    }
 
-    if(const auto *RecDeclRepr = TL->getType().getCanonicalType()->getAsRecordDecl()) {
+    if (const auto *RecDeclRepr =
+            TL->getType().getCanonicalType()->getAsRecordDecl()) {
       // Skip third-party includes outside of in-root
       if (!DpctGlobalInfo::isInCudaPath(RecDeclRepr->getBeginLoc()))
         return;
