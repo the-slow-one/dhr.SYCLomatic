@@ -161,3 +161,20 @@ void test_cuEventRecord_crash(CUevent hEvent, CUstream hStream)
   // CHECK: int result = DPCT_CHECK_ERROR(*(dpct::event_ptr)hEvent = ((dpct::queue_ptr)hStream)->ext_oneapi_submit_barrier());
   CUresult result = cuEventRecord((CUevent)hEvent, (CUstream)hStream);
 }
+
+unsigned getEventFlags(bool enabledSyncBlock) {
+  // CHECK: /*
+  // CHECK-NEXT: DPCT1136:{{[0-9]+}}: SYCL event does not support the feature enabled in CUDA event created with flag "CU_EVENT_DISABLE_TIMING".
+  // CHECK-NEXT: */
+  // CHECK-NEXT: unsigned flags = 0x0;
+  unsigned flags = CU_EVENT_DISABLE_TIMING;
+
+  if (enabledSyncBlock)
+    // CHECK: /*
+    // CHECK-NEXT: DPCT1136:{{[0-9]+}}: SYCL event does not support the feature enabled in CUDA event created with flag "CU_EVENT_BLOCKING_SYNC".
+    // CHECK-NEXT: */
+    // CHECK-NEXT: flags |= 0x0;
+    flags |= CU_EVENT_BLOCKING_SYNC;
+
+  return flags;
+}

@@ -2569,6 +2569,10 @@ void EventAPICallRule::registerMatcher(MatchFinder &MF) {
                                unless(parentStmt())))
                     .bind("eventAPICallUsed"),
                 this);
+  MF.addMatcher(
+      declRefExpr(to(enumConstantDecl(hasType(enumDecl(hasName("CUevent_flags_enum"))))))
+          .bind("eventEnum"),
+      this);
 }
 
 bool isEqualOperator(const Stmt *S) {
@@ -2879,6 +2883,14 @@ bool EventAPICallRule::isEventElapsedTimeFollowed(const CallExpr *Expr) {
 }
 
 void EventAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
+  if (auto *DRE = getNodeAsType<DeclRefExpr>(Result, "eventEnum")) {
+    if (auto *EC = dyn_cast<EnumConstantDecl>(DRE->getDecl())) {
+      std::string EName = EC->getName().str();
+      report(DRE->getBeginLoc(), Diagnostics::UNSUPPORTED_EVENT_FEATURE, false, EName);
+      emplaceTransformation(new ReplaceStmt(DRE, "0x0"));
+    }
+  }
+
   bool IsAssigned = false;
   const CallExpr *CE = getNodeAsType<CallExpr>(Result, "eventAPICall");
   if (!CE) {

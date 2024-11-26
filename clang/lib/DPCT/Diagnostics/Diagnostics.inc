@@ -296,6 +296,8 @@ DEF_WARNING(SPARSE_NNZ, 1134, MEDIUM_LEVEL, "The tool cannot deduce the consumer
 DEF_COMMENT(SPARSE_NNZ, 1134, MEDIUM_LEVEL, "The tool cannot deduce the consumer API (\"dpct::sparse::csrgemm\") of this API, and this API has 2 arguments depending on the 8th and the 12th parameters of the consumer API. Please replace the 2 arguments tagged as \"dpct_placeholder\" with the corresponding value.")
 DEF_WARNING(JOINT_MATRIX_SHAPE, 1135, HIGH_LEVEL, "Please check if joint_matrix implementations support the combination of data type and matrix shape type in the target hardware.")
 DEF_COMMENT(JOINT_MATRIX_SHAPE, 1135, HIGH_LEVEL, "Please check if joint_matrix implementations support the combination of data type and matrix shape type in the target hardware.")
+DEF_WARNING(UNSUPPORTED_EVENT_FEATURE, 1136, LOW_LEVEL, "SYCL event does not support the feature enabled in CUDA event created with flag \"%0\".")
+DEF_COMMENT(UNSUPPORTED_EVENT_FEATURE, 1136, LOW_LEVEL, "SYCL event does not support the feature enabled in CUDA event created with flag \"{0}\".")
 // clang-format on
 
 #undef DEF_COMMENT
