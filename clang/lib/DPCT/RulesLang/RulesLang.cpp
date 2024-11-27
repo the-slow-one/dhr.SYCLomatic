@@ -2888,8 +2888,9 @@ void EventAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
       std::string EName = EC->getName().str();
       report(DRE->getBeginLoc(), Diagnostics::UNSUPPORTED_EVENT_FEATURE, false,
              EName);
-      emplaceTransformation(new ReplaceStmt(DRE, "0x0"));
+      emplaceTransformation(new ReplaceStmt(DRE, "0"));
     }
+    return;
   }
 
   bool IsAssigned = false;
