@@ -2886,8 +2886,8 @@ void EventAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
   if (auto *DRE = getNodeAsType<DeclRefExpr>(Result, "eventEnum")) {
     if (auto *EC = dyn_cast<EnumConstantDecl>(DRE->getDecl())) {
       std::string EName = EC->getName().str();
-      report(DRE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL, false,
-             EName, "is", "event");
+      report(DRE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL,
+             false, EName, "is", "event");
       emplaceTransformation(new ReplaceStmt(DRE, "0"));
     }
     return;
@@ -4261,8 +4261,8 @@ void StreamAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
     emplaceTransformation(new ReplaceStmt(CE, ReplStr));
   } else if (FuncName == "cudaStreamGetFlags" ||
              FuncName == "cudaStreamGetPriority") {
-    report(CE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL,
-           false, "flag and priority options", "are", "queues");
+    report(CE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL, false,
+           "flag and priority options", "are", "queues");
     auto StmtStr1 = getStmtSpelling(CE->getArg(1));
     std::string ReplStr{"*("};
     ReplStr += StmtStr1;
