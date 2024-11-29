@@ -2585,6 +2585,10 @@ void EventAPICallRule::registerMatcher(MatchFinder &MF) {
                                unless(parentStmt())))
                     .bind("eventAPICallUsed"),
                 this);
+  MF.addMatcher(declRefExpr(to(enumConstantDecl(hasType(
+                                enumDecl(hasName("CUevent_flags_enum"))))))
+                    .bind("eventEnum"),
+                this);
 }
 
 bool isEqualOperator(const Stmt *S) {
@@ -2895,6 +2899,16 @@ bool EventAPICallRule::isEventElapsedTimeFollowed(const CallExpr *Expr) {
 }
 
 void EventAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
+  if (auto *DRE = getNodeAsType<DeclRefExpr>(Result, "eventEnum")) {
+    if (auto *EC = dyn_cast<EnumConstantDecl>(DRE->getDecl())) {
+      std::string EName = EC->getName().str();
+      report(DRE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL,
+             false, EName, "is", "event");
+      emplaceTransformation(new ReplaceStmt(DRE, "0"));
+    }
+    return;
+  }
+
   bool IsAssigned = false;
   const CallExpr *CE = getNodeAsType<CallExpr>(Result, "eventAPICall");
   if (!CE) {
@@ -4263,8 +4277,8 @@ void StreamAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
     emplaceTransformation(new ReplaceStmt(CE, ReplStr));
   } else if (FuncName == "cudaStreamGetFlags" ||
              FuncName == "cudaStreamGetPriority") {
-    report(CE->getBeginLoc(), Diagnostics::STREAM_FLAG_PRIORITY_NOT_SUPPORTED,
-           false);
+    report(CE->getBeginLoc(), Diagnostics::UNSUPPORTED_FEATURE_IN_SYCL, false,
+           "flag and priority options", "are", "queues");
     auto StmtStr1 = getStmtSpelling(CE->getArg(1));
     std::string ReplStr{"*("};
     ReplStr += StmtStr1;
