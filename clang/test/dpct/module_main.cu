@@ -20,7 +20,7 @@ int main(){
     //CHECK: /*
     //CHECK-NEXT: DPCT1104:{{[0-9]+}}: 'Data.c_str()' should point to a dynamic library loaded in memory. The dynamic library should supply wrapped kernel functions.
     //CHECK-NEXT: */
-    //CHECK-NEXT: M = dpct::load_kernel_library_mem((const char *)Data.c_str());
+    //CHECK-NEXT: M = dpct::load_kernel_library_mem(Data.c_str());
     cuModuleLoadData(&M, Data.c_str());
 
     unsigned char *DataPtr;
@@ -33,7 +33,7 @@ int main(){
     //CHECK: /*
     //CHECK-NEXT: DPCT1104:{{[0-9]+}}: 'Data.c_str()' should point to a dynamic library loaded in memory. The dynamic library should supply wrapped kernel functions.
     //CHECK-NEXT: */
-    //CHECK-NEXT: M = dpct::load_kernel_library_mem((const char *)Data.c_str());
+    //CHECK-NEXT: M = dpct::load_kernel_library_mem(Data.c_str());
     cuModuleLoadDataEx(&M, Data.c_str(), 0, NULL, NULL);
 
     //CHECK: /*
