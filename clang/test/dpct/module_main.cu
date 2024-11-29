@@ -25,7 +25,7 @@ int main(){
 
     unsigned char *DataPtr;
     //CHECK: /*
-    //CHECK-NEXT: DPCT1104:{{[0-9]+}}: 'DataPtr)' should point to a dynamic library loaded in memory. The dynamic library should supply wrapped kernel functions.
+    //CHECK-NEXT: DPCT1104:{{[0-9]+}}: 'DataPtr' should point to a dynamic library loaded in memory. The dynamic library should supply wrapped kernel functions.
     //CHECK-NEXT: */
     //CHECK-NEXT: M = dpct::load_kernel_library_mem((const char *)DataPtr);
     cuModuleLoadData(&M, DataPtr);
