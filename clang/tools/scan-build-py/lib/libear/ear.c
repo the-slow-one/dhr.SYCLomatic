@@ -1715,8 +1715,8 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 #endif // SYCLomatic_CUSTOMIZATION
 
 #ifdef SYCLomatic_CUSTOMIZATION
-int is_tool_available(const char *pathname) {
-
+int is_tool_available(char const *argv[], size_t const argc) {
+  const char *pathname = argv[0];
   int len = strlen(pathname);
   int is_nvcc = 0;
   int is_nvcc_available = 0;
@@ -1744,6 +1744,29 @@ int is_tool_available(const char *pathname) {
     }
     return 0;
   }
+
+  int is_ld = 0;
+  if (len == 2 && pathname[1] == 'd' && pathname[0] == 'l') {
+    // To handle case like "ld"
+    is_ld = 1;
+  }
+  if (len > 2 && pathname[len - 1] == 'd' && pathname[len - 2] == 'l' &&
+      pathname[len - 3] == '/') {
+    // To handle case like "/path/to/ld"
+    is_ld = 1;
+  }
+  if (is_ld) {
+    if (!is_nvcc_available) {
+      for (size_t idx = 0; idx < argc; idx++) {
+        // if ld linker command uses cuda libarary like libcuda.so or
+        // libcudart.so, then the ld command should be intercepted.
+        if (strcmp(argv[idx], "-lcudart") == 0 ||
+            strcmp(argv[idx], "-lcuda") == 0)
+          return 0;
+      }
+    }
+  }
+
   return 1;
 }
 
@@ -1801,7 +1824,7 @@ static void bear_report_call(char const *fun, char const *const argv[]) {
 
   emit_cmake_warning(argv, argc);
 
-  if (is_tool_available(argv[0])) {
+  if (is_tool_available(argv, argc)) {
     for (size_t it = 0; it < argc; ++it) {
       fprintf(fd, "%s%c", argv[it], US);
     }
