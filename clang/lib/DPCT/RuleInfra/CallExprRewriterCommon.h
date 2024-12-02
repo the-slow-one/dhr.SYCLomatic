@@ -818,15 +818,17 @@ inline std::function<std::string(const CallExpr *C)> getDerefedType(size_t Idx) 
   };
 }
 
-inline std::function<std::string(const CallExpr *C)> getReplacedTypeNameForDerefExpr(size_t Idx) {
+inline std::function<std::string(const CallExpr *C)>
+getReplacedTypeNameForDerefExpr(size_t Idx) {
   return [=](const CallExpr *C) -> std::string {
     if (Idx >= C->getNumArgs())
       return "";
 
-    const auto* ArgExpr = C->getArg(Idx);
+    const auto *ArgExpr = C->getArg(Idx);
     QualType ArgExprType = ArgExpr->getType();
 
-    if (auto *CSCE = dyn_cast<ExplicitCastExpr>(ArgExpr->IgnoreImplicitAsWritten()))
+    if (auto *CSCE =
+            dyn_cast<ExplicitCastExpr>(ArgExpr->IgnoreImplicitAsWritten()))
       ArgExprType = CSCE->getTypeAsWritten();
 
     while (const auto *ET = dyn_cast<ElaboratedType>(ArgExprType)) {
@@ -839,7 +841,9 @@ inline std::function<std::string(const CallExpr *C)> getReplacedTypeNameForDeref
     }
 
     ArgExprType = DerefQualType(ArgExprType);
-    return ArgExprType.isNull() ? "" : DpctGlobalInfo::getReplacedTypeName(ArgExprType);
+    return ArgExprType.isNull()
+               ? ""
+               : DpctGlobalInfo::getReplacedTypeName(ArgExprType);
   };
 }
 
