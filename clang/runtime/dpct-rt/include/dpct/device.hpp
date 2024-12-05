@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <climits>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -514,6 +515,10 @@ public:
 
   size_t get_local_mem_size() const {
     return get_device_info().get_local_mem_size();
+  }
+
+  int get_max_pitch() const {
+    return INT_MAX;
   }
 
   /// Get the number of bytes of free and total memory on the SYCL device.
