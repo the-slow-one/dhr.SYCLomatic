@@ -517,9 +517,7 @@ public:
     return get_device_info().get_local_mem_size();
   }
 
-  int get_max_pitch() const {
-    return INT_MAX;
-  }
+  int get_max_pitch() const { return INT_MAX; }
 
   /// Get the number of bytes of free and total memory on the SYCL device.
   /// \param [out] free_memory The number of bytes of free memory on the SYCL device.
