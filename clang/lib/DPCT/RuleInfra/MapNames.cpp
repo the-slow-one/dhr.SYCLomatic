@@ -271,6 +271,8 @@ void MapNames::setExplicitNamespaceMap(
        std::make_shared<TypeNameRule>(getDpctNamespace() + "err0",
                                       HelperFeatureEnum::device_ext)},
       {"CUjit_option", std::make_shared<TypeNameRule>("int")},
+      {"CUjit_target", std::make_shared<TypeNameRule>("int")},
+      {"CUjitInputType", std::make_shared<TypeNameRule>("int")},
       {"CUresult", std::make_shared<TypeNameRule>("int")},
       {"CUcontext", std::make_shared<TypeNameRule>("int")},
       {"CUmodule",
