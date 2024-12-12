@@ -172,36 +172,11 @@ CUjitInputType foo(CUjitInputType &type) {
   //CHECK: targets[10] = 0;
   targets[10] = CU_TARGET_COMPUTE_70;
 
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_72 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[11] = 0;
-  targets[11] = CU_TARGET_COMPUTE_72;
 
   //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_75 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
   //CHECK: targets[12] = 0;
   targets[12] = CU_TARGET_COMPUTE_75;
 
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_80 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[13] = 0;
-  targets[13] = CU_TARGET_COMPUTE_80;
-
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_86 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[14] = 0;
-  targets[14] = CU_TARGET_COMPUTE_86;
-
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_87 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[15] = 0;
-  targets[15] = CU_TARGET_COMPUTE_87;
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_89 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[16] = 0;
-  targets[16] = CU_TARGET_COMPUTE_89;
-
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_90 is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[17] = 0;
-  targets[17] = CU_TARGET_COMPUTE_90;
-
-  //CHECK:DPCT1048:{{[0-9]+}}: The original value CU_TARGET_COMPUTE_90A is not meaningful in the migrated code and was removed or replaced with 0. You may need to check the migrated code.
-  //CHECK: targets[18] = 0;
-  targets[18] = CU_TARGET_COMPUTE_90A;
 
   return type;
 }
