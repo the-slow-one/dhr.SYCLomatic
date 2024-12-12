@@ -2066,12 +2066,11 @@ void ErrorConstantsRule::runRule(const MatchFinder::MatchResult &Result) {
 
 // Rule for CU_JIT enums.
 void CU_JITEnumsRule::registerMatcher(MatchFinder &MF) {
-  MF.addMatcher(
-      declRefExpr(
-          to(enumConstantDecl(anyOf(matchesName(
-              "(CU_JIT_*)"),matchesName("(CU_TARGET_COMPUTE_*)")))))
-          .bind("CU_JITConstants"),
-      this);
+  MF.addMatcher(declRefExpr(to(enumConstantDecl(
+                                anyOf(matchesName("(CU_JIT_*)"),
+                                      matchesName("(CU_TARGET_COMPUTE_*)")))))
+                    .bind("CU_JITConstants"),
+                this);
 }
 
 void CU_JITEnumsRule::runRule(const MatchFinder::MatchResult &Result) {
