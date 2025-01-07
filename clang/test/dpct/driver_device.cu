@@ -57,7 +57,11 @@ void test() {
 
   // CHECK: result7 = dpct::get_device(device).get_max_pitch();
   cuDeviceGetAttribute(&result7,CU_DEVICE_ATTRIBUTE_MAX_PITCH, device);
-  std::cout << " result7 " << result5 << std::endl;
+  std::cout << " result7 " << result7 << std::endl;
+
+  // CHECK: result1 = dpct::get_device(device).get_async_engine_count();
+  cuDeviceGetAttribute(&result1,CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT, device);
+  std::cout << " result1 " << result1 << std::endl;
 }
 
 int main(){
