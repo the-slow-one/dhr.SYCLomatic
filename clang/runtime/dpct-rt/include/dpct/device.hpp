@@ -519,7 +519,6 @@ public:
 
   int get_max_pitch() const { return INT_MAX; }
 
-  // CU_DEVICE_ATTRIBUTE_ASYNC_ENGINE_COUNT is irrelevant in SYCL
   int get_async_engine_count() const { return 0; }
 
   /// Get the number of bytes of free and total memory on the SYCL device.
