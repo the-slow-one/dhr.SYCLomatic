@@ -320,6 +320,7 @@ public:
   constexpr kernel_library(void *ptr) : ptr{ptr} {}
 
   operator void *() const { return ptr; }
+  explicit operator uint64_t() const { return (uint64_t)this; }
 
 private:
   void *ptr;
