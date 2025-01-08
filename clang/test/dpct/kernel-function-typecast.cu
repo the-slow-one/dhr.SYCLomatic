@@ -1,6 +1,6 @@
 // RUN: dpct -out-root %T/kernel-function-typecast %s --cuda-include-path="%cuda-path/include"
 // RUN: FileCheck --match-full-lines --input-file %T/kernel-function-typecast/kernel-function-typecast.dp.cpp %s
-// RUN: icpx -c -fsycl %T/kernel-function-typecast/kernel-function-typecast.dp.cpp -o %T/kernel-function-typecast/kernel-function-typecast.dp.o
+// RUN: %if build_lit %{icpx -c -fsycl %T/kernel-function-typecast/kernel-function-typecast.dp.cpp -o %T/kernel-function-typecast/kernel-function-typecast.dp.o %}
 
 #include <cstdint>
 #include <cuda.h>
