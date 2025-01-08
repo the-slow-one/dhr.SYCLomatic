@@ -404,7 +404,7 @@ public:
     ptr(q, range, a, args, extra);
   }
 
-  explicit operator uint64_t() const { return reinterpret_cast<uint64_t>(this); }
+  explicit operator uint64_t() const { return reinterpret_cast<uint64_t>(ptr); }
 
 private:
   dpct::kernel_functor ptr;
