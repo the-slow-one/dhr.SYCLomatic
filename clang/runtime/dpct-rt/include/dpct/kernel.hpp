@@ -395,7 +395,8 @@ class kernel_function {
 public:
   constexpr kernel_function() : ptr{nullptr} {}
   constexpr kernel_function(dpct::kernel_functor ptr) : ptr{ptr} {}
-  kernel_function(uint64_t addr) : ptr(reinterpret_cast<dpct::kernel_functor>(addr)) {}
+  kernel_function(uint64_t addr)
+      : ptr(reinterpret_cast<dpct::kernel_functor>(addr)) {}
 
   operator void *() const { return ((void *)ptr); }
 
