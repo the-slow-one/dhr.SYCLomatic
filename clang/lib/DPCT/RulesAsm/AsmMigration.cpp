@@ -943,24 +943,27 @@ protected:
       return SYCLGenError();
     OS() << " = ";
 
-    std::string Op[3];
-    for (auto Idx : llvm::seq(0, 3)) {
+    std::string Op[4];
+    for (auto Idx : llvm::seq(0, 4)) {
       if (tryEmitStmt(Op[Idx], I->getInputOperand(Idx)))
         return SYCLGenError();
     }
 
-    if (!isa<InlineAsmIntegerLiteral>(I->getInputOperand(3)))
-      return SYCLGenError();
-    unsigned Imm = dyn_cast<InlineAsmIntegerLiteral>(I->getInputOperand(3))
-                       ->getValue()
-                       .getZExtValue();
+    if (!isa<InlineAsmIntegerLiteral>(I->getInputOperand(3))) {
+      OS() << MapNames::getDpctNamespace() << "ternary_logic_op(" << Op[0]
+           << ", " << Op[1] << ", " << Op[2] << ", " << Op[3] << ")";
+
+    } else {
+      unsigned Imm = dyn_cast<InlineAsmIntegerLiteral>(I->getInputOperand(3))
+                         ->getValue()
+                         .getZExtValue();
 
 #define EMPTY nullptr
 #define EMPTY4 EMPTY, EMPTY, EMPTY, EMPTY
 #define EMPTY16 EMPTY4, EMPTY4, EMPTY4, EMPTY4
-    constexpr const char *FastMap[256] = {
-        /*0x00*/ "0",
-        // clang-format off
+      constexpr const char *FastMap[256] = {
+          /*0x00*/ "0",
+          // clang-format off
       EMPTY16, EMPTY4, EMPTY4, EMPTY,
       /*0x1a*/ "({0} & {1} | {2}) ^ {0}",
       EMPTY, EMPTY, EMPTY,
@@ -988,12 +991,12 @@ protected:
       EMPTY16, EMPTY, EMPTY, EMPTY,
       /*0xfe*/ "{0} | {1} | {2}",
       /*0xff*/ "uint32_t(-1)"};
-    // clang-format on
+      // clang-format on
 
 #undef EMPTY16
 #undef EMPTY4
 #undef EMPTY
-    // clang-format off
+      // clang-format off
     constexpr const char *SlowMap[8] = {
       /* 0x01*/ "(~{0} & ~{1} & ~{2})",
       /* 0x02*/ "(~{0} & ~{1} & {2})",
@@ -1004,20 +1007,21 @@ protected:
       /* 0x40*/ "({0} & {1} & ~{2})",
       /* 0x80*/ "({0} & {1} & {2})"
     };
-    // clang-format on
+      // clang-format on
 
-    if (FastMap[Imm]) {
-      OS() << llvm::formatv(FastMap[Imm], Op[0], Op[1], Op[2]);
-    } else {
-      SmallVector<std::string, 8> Templates;
-      for (auto Bit : llvm::seq(0, 8)) {
-        if (Imm & (1U << Bit)) {
-          Templates.push_back(
-              llvm::formatv(SlowMap[Bit], Op[0], Op[1], Op[2]).str());
+      if (FastMap[Imm]) {
+        OS() << llvm::formatv(FastMap[Imm], Op[0], Op[1], Op[2]);
+      } else {
+        SmallVector<std::string, 8> Templates;
+        for (auto Bit : llvm::seq(0, 8)) {
+          if (Imm & (1U << Bit)) {
+            Templates.push_back(
+                llvm::formatv(SlowMap[Bit], Op[0], Op[1], Op[2]).str());
+          }
         }
-      }
 
-      OS() << llvm::join(Templates, " | ");
+        OS() << llvm::join(Templates, " | ");
+      }
     }
 
     endstmt();
