@@ -8201,7 +8201,8 @@ void DriverDeviceAPIRule::registerMatcher(ast_matchers::MatchFinder &MF) {
     return hasAnyName(
         "cuDeviceGet", "cuDeviceComputeCapability", "cuDriverGetVersion",
         "cuDeviceGetCount", "cuDeviceGetAttribute", "cuDeviceGetName",
-        "cuDeviceGetUuid", "cuDeviceGetUuid_v2", "cuGetErrorString");
+        "cuDeviceGetUuid", "cuDeviceGetUuid_v2", "cuGetErrorString",
+        "cuGetErrorName");
   };
 
   MF.addMatcher(
