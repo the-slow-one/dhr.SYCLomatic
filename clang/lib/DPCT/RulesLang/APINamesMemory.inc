@@ -727,7 +727,7 @@ CONDITIONAL_FACTORY_ENTRY(
             "cuMemGetAllocationPropertiesFromHandle",
             MEMBER_EXPR(DEREF(0), false, LITERAL("location.id")),
             CALL(MapNames::getDpctNamespace() + "get_device_id",
-                MEMBER_CALL(ARG(1), true, "get_device"))))),
+                 MEMBER_CALL(ARG(1), true, "get_device"))))),
     UNSUPPORT_FACTORY_ENTRY("cuMemGetAllocationPropertiesFromHandle",
                             Diagnostics::TRY_EXPERIMENTAL_FEATURE,
                             ARG("cuMemGetAllocationPropertiesFromHandle"),
