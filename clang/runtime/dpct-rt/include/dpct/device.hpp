@@ -13,6 +13,7 @@
 #include <array>
 #include <climits>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -84,6 +85,8 @@ typedef sycl::event *event_ptr;
 typedef sycl::queue *queue_ptr;
 
 typedef char *device_ptr;
+
+using queue_callback = std::function<void (queue_ptr, int, void*)>;
 
 /// Destroy \p event pointed memory.
 ///
