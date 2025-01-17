@@ -679,7 +679,7 @@ typedef sycl::ext::oneapi::experimental::physical_mem *physical_mem_ptr;
 struct mem_location {
   int id = 0;
   int type = 1; // Location type. Value 1 means device location, and thus, id is a
-            // device id.
+                // device id.
 };
 
 struct mem_prop {
