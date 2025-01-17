@@ -680,11 +680,16 @@ struct mem_location {
   int id;
   int type; // Location type. Value 1 means device location, and thus, id is a
             // device id.
+  public:
+  mem_location() : id{0}, type{1} {}
 };
 
 struct mem_prop {
   mem_location location;
   int type; // Memory type. Value 1 means default device memory.
+
+  public:
+  mem_location() : location{}, type{1} {}
 };
 
 struct mem_access_desc {
