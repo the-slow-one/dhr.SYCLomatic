@@ -35,7 +35,7 @@ ASSIGNABLE_FACTORY(FEATURE_REQUEST_FACTORY(
     HelperFeatureEnum::device_ext,
     ASSIGN_FACTORY_ENTRY("cuStreamGetCtx", DEREF(1),
                          CALL(MapNames::getDpctNamespace() + "get_device_id",
-                            MEMBER_CALL(ARG(0), true, "get_device")))))
+                              MEMBER_CALL(ARG(0), true, "get_device")))))
 
 ASSIGNABLE_FACTORY(CONDITIONAL_FACTORY_ENTRY(
     UseExtGraph,
