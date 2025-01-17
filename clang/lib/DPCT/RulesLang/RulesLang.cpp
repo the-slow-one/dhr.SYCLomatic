@@ -4178,7 +4178,7 @@ void StreamAPICallRule::registerMatcher(MatchFinder &MF) {
         "cudaStreamIsCapturing", "cudaStreamQuery", "cudaStreamWaitEvent",
         "cudaStreamAddCallback", "cuStreamCreate", "cuStreamSynchronize",
         "cuStreamWaitEvent", "cuStreamDestroy_v2", "cuStreamAttachMemAsync",
-        "cuStreamAddCallback", "cuStreamQuery");
+        "cuStreamAddCallback", "cuStreamQuery", "cuStreamGetCtx");
   };
 
   MF.addMatcher(
