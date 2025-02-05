@@ -6267,7 +6267,6 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
     EA.applyAllSubExprRepl();
     return;
   }
-  int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
   if (Name == "cudaFreeHost" || Name == "cuMemFreeHost") {
     if (DpctGlobalInfo::getUsmLevel() ==  UsmLevel::UL_Restricted) {
       CheckCanUseCLibraryMallocOrFree Checker(0, true);
@@ -6277,6 +6276,7 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
       if(Checker(C)) {
         Repl << "free(" << EA.getReplacedString() << ")";
       } else {
+        int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
         buildTempVariableMap(Index, C, HelperFuncType::HFT_DefaultQueue);
         Repl << MapNames::getClNamespace() + "free(" << EA.getReplacedString()
            << ", {{NEEDREPLACEQ" + std::to_string(Index) + "}})";
