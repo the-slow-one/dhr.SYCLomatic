@@ -12,6 +12,7 @@
 #include "RuleInfra/CallExprRewriter.h"
 #include "RuleInfra/CallExprRewriterCommon.h"
 #include "RuleInfra/ExprAnalysis.h"
+#include "RuleInfra/MapNames.h"
 #include "RuleInfra/MemberExprRewriter.h"
 #include "RuleInfra/MigrationStatistics.h"
 #include "RulesLang/BarrierFenceSpaceAnalyzer.h"
@@ -6250,7 +6251,6 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
                                         const CallExpr *C,
                                         const UnresolvedLookupExpr *ULExpr,
                                         bool IsAssigned) {
-
   std::string Name;
   if (ULExpr) {
     Name = ULExpr->getName().getAsString();
@@ -6260,6 +6260,29 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
   if (isPlaceholderIdxDuplicated(C))
     return;
 
+  if (Name == "cuMemFree_v2") {
+    const auto *const ArgExpr = C->getArg(0);
+    const Expr* SubExpr = ArgExpr->IgnoreUnlessSpelledInSource();
+    const Type* SubExprType = SubExpr->getType().getTypePtr();
+    const NamedDecl* TypeName = getNamedDecl(SubExprType);
+
+    if (TypeName->getNameAsString() != "CUdeviceptr") {
+      if (DpctGlobalInfo::getUsmLevel() ==  UsmLevel::UL_Restricted) {
+        ExprAnalysis EA;
+        EA.analyze(C->getArg(0));
+        std::ostringstream Replacement;
+        int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
+        buildTempVariableMap(Index, C, HelperFuncType::HFT_DefaultQueue);
+        Replacement << MapNames::getClNamespace() << "free(reinterpret_cast<dpct::device_ptr>(" 
+            << EA.getReplacedString() << "), {{NEEDREPLACEQ" + std::to_string(Index) + "}})";
+        emplaceTransformation(new ReplaceStmt(C, std::move(Replacement.str())));
+      } else {
+        emplaceTransformation(new ReplaceCalleeName(C, MapNames::getDpctNamespace() + "dpct_free"));
+      }
+      return;
+    }
+  }
+
   auto Itr = CallExprRewriterFactoryBase::RewriterMap->find(Name);
   if (Itr != CallExprRewriterFactoryBase::RewriterMap->end()) {
     ExprAnalysis EA(C);
@@ -6267,6 +6290,7 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
     EA.applyAllSubExprRepl();
     return;
   }
+  int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
   if (Name == "cudaFreeHost" || Name == "cuMemFreeHost") {
     if (DpctGlobalInfo::getUsmLevel() ==  UsmLevel::UL_Restricted) {
       CheckCanUseCLibraryMallocOrFree Checker(0, true);
@@ -6276,7 +6300,6 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
       if(Checker(C)) {
         Repl << "free(" << EA.getReplacedString() << ")";
       } else {
-        int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
         buildTempVariableMap(Index, C, HelperFuncType::HFT_DefaultQueue);
         Repl << MapNames::getClNamespace() + "free(" << EA.getReplacedString()
            << ", {{NEEDREPLACEQ" + std::to_string(Index) + "}})";
