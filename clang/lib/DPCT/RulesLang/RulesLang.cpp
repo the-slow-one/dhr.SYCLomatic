@@ -6262,22 +6262,25 @@ void MemoryMigrationRule::freeMigration(const MatchFinder::MatchResult &Result,
 
   if (Name == "cuMemFree_v2") {
     const auto *const ArgExpr = C->getArg(0);
-    const Expr* SubExpr = ArgExpr->IgnoreUnlessSpelledInSource();
-    const Type* SubExprType = SubExpr->getType().getTypePtr();
-    const NamedDecl* TypeName = getNamedDecl(SubExprType);
+    const Expr *SubExpr = ArgExpr->IgnoreUnlessSpelledInSource();
+    const Type *SubExprType = SubExpr->getType().getTypePtr();
+    const NamedDecl *TypeName = getNamedDecl(SubExprType);
 
     if (TypeName->getNameAsString() != "CUdeviceptr") {
-      if (DpctGlobalInfo::getUsmLevel() ==  UsmLevel::UL_Restricted) {
+      if (DpctGlobalInfo::getUsmLevel() == UsmLevel::UL_Restricted) {
         ExprAnalysis EA;
         EA.analyze(C->getArg(0));
         std::ostringstream Replacement;
         int Index = DpctGlobalInfo::getHelperFuncReplInfoIndexThenInc();
         buildTempVariableMap(Index, C, HelperFuncType::HFT_DefaultQueue);
-        Replacement << MapNames::getClNamespace() << "free(reinterpret_cast<dpct::device_ptr>(" 
-            << EA.getReplacedString() << "), {{NEEDREPLACEQ" + std::to_string(Index) + "}})";
+        Replacement << MapNames::getClNamespace()
+                    << "free(reinterpret_cast<dpct::device_ptr>("
+                    << EA.getReplacedString()
+                    << "), {{NEEDREPLACEQ" + std::to_string(Index) + "}})";
         emplaceTransformation(new ReplaceStmt(C, std::move(Replacement.str())));
       } else {
-        emplaceTransformation(new ReplaceCalleeName(C, MapNames::getDpctNamespace() + "dpct_free"));
+        emplaceTransformation(new ReplaceCalleeName(
+            C, MapNames::getDpctNamespace() + "dpct_free"));
       }
       return;
     }
