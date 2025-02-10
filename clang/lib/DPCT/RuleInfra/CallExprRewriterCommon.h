@@ -175,7 +175,7 @@ public:
     if (const Type *SubExprType = CleanSubExpr->getType().getTypePtr()) {
       if (const NamedDecl *TypeName = getNamedDecl(SubExprType)) {
         if (TypeName->getNameAsString() != GivenTypeName) {
-          Stream << "reinterpret_cast<dpct::device_ptr>(";
+          Stream << "reinterpret_cast<" << ReplacementTypeName << ">(";
           dpct::print(Stream, SubExpr);
           Stream << ")";
           return;
